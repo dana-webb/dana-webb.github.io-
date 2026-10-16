@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Дана — веб-разработчик. Авторские лендинги и сайты-каталоги для малого бизнеса."
+    />
+    <meta name="theme-color" content="#080808" />
+    <title>Дана — сайты с характером</title>
+
+    <!-- Tailwind Play CDN: подходит для статического портфолио без сборки. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              ink: "#080808",
+              bone: "#f1ede5",
+              paper: "#d8d2c7",
+              smoke: "#9d9992",
+              chrome: "#b6b7b9",
+              oxblood: "#681825",
+              walnut: "#2a1a14",
+            },
+            fontFamily: {
+              sans: ["Manrope", "system-ui", "sans-serif"],
+              editorial: ["Cormorant Garamond", "Georgia", "serif"],
+              mono: ["IBM Plex Mono", "ui-monospace", "monospace"],
+            },
+          },
+        },
+      };
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,500;1,600&family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        color-scheme: dark;
+        --ink: #080808;
+        --bone: #f1ede5;
+        --paper: #d8d2c7;
+        --smoke: #9d9992;
+        --chrome: #b6b7b9;
+        --oxblood: #681825;
+        --walnut: #2a1a14;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        min-width: 320px;
+        overflow-x: hidden;
+      }
+
+      /* Едва заметное зерно делает большие однотонные поля менее цифровыми. */
+      body::before {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        pointer-events: none;
+        content: "";
+        opacity: 0.035;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E");
+      }
+
+      ::selection {
+        color: var(--bone);
+        background: var(--oxblood);
+      }
+
+      :focus-visible {
+        outline: 2px solid var(--bone);
+        outline-offset: 4px;
+      }
+
+      .text-balance {
+        text-wrap: balance;
+      }
+
+      /* Контурное слово используется один раз как журнальный акцент. */
+      .outline-word {
+        color: transparent;
+        -webkit-text-stroke: 1px rgba(241, 237, 229, 0.72);
+      }
+
+      /* Металлический эффект — локальная отсылка к хрому из референсов. */
+      .chrome-text {
+        color: transparent;
+        background:
+          linear-gradient(
+            100deg,
+            #747474 0%,
+            #f0f0ec 28%,
+            #8b8b8b 52%,
+            #e4e2dc 72%,
+            #696969 100%
+          );
+        background-clip: text;
+        -webkit-background-clip: text;
+      }
+
+      .hero-metal {
+        background:
+          linear-gradient(135deg, rgba(255, 255, 255, 0.18), transparent 34%),
+          linear-gradient(315deg, rgba(255, 255, 255, 0.08), transparent 46%),
+          #111111;
+      }
+
+      .hero-metal::before,
+      .hero-metal::after {
+        position: absolute;
+        content: "";
+        border: 1px solid rgba(241, 237, 229, 0.24);
+        border-radius: 999px;
+      }
+
+      .hero-metal::before {
+        inset: 12% 15%;
+      }
+
+      .hero-metal::after {
+        inset: 25% 28%;
+        border-color: rgba(241, 237, 229, 0.12);
+      }
+
+      /* Бесконечная строка работает без JavaScript. */
+      .ticker-track {
+        width: max-content;
+        animation: ticker 24s linear infinite;
+      }
+
+      @keyframes ticker {
+        to {
+          transform: translateX(-50%);
+        }
+      }
+
+      /* Появление секций включается IntersectionObserver в app.js. */
+      .reveal {
+        opacity: 0;
+        transform: translateY(24px);
+        transition:
+          opacity 0.75s ease,
+          transform 0.75s cubic-bezier(0.2, 0.75, 0.2, 1);
+      }
+
+      .reveal.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .case-visual-inner {
+        transition: transform 0.7s cubic-bezier(0.2, 0.75, 0.2, 1);
+      }
+
+      .case-card:hover .case-visual-inner {
+        transform: scale(1.025);
+      }
+
+      /* Миниатюры кейсов собраны кодом — без чужих изображений и мокапов. */
+      .catalog-preview {
+        color: #17130f;
+        background: #e9e1d5;
+      }
+
+      .catalog-product {
+        position: relative;
+        overflow: hidden;
+        min-height: 132px;
+        border: 1px solid rgba(23, 19, 15, 0.16);
+        background: rgba(255, 255, 255, 0.36);
+      }
+
+      .catalog-product::before {
+        position: absolute;
+        left: 50%;
+        top: 22%;
+        width: 40%;
+        height: 58%;
+        content: "";
+        transform: translateX(-50%);
+        border-radius: 48% 48% 36% 36%;
+        background: var(--walnut);
+      }
+
+      .catalog-product:nth-child(2)::before {
+        width: 48%;
+        border-radius: 999px;
+        background: var(--oxblood);
+      }
+
+      .catalog-product:nth-child(3)::before {
+        top: 30%;
+        height: 48%;
+        border-radius: 4px;
+        background: #a6a29a;
+      }
+
+      .shop-preview {
+        color: #f1ede5;
+        background:
+          linear-gradient(145deg, rgba(104, 24, 37, 0.6), transparent 46%),
+          #100d0c;
+      }
+
+      .shop-object {
+        position: absolute;
+        width: 44%;
+        aspect-ratio: 1 / 1.25;
+        right: 10%;
+        top: 14%;
+        transform: rotate(8deg);
+        border: 1px solid rgba(241, 237, 229, 0.22);
+        border-radius: 48% 48% 18% 18%;
+        background:
+          linear-gradient(120deg, rgba(255, 255, 255, 0.2), transparent 22%),
+          #171717;
+      }
+
+      .shop-object::after {
+        position: absolute;
+        left: 16%;
+        right: 16%;
+        bottom: 12%;
+        height: 1px;
+        content: "";
+        background: rgba(241, 237, 229, 0.45);
+      }
+
+      .pay-preview {
+        color: #171717;
+        background:
+          linear-gradient(120deg, rgba(255, 255, 255, 0.64), transparent 35%),
+          #b8b7b2;
+      }
+
+      .pay-panel {
+        background: rgba(241, 237, 229, 0.88);
+        border: 1px solid rgba(23, 23, 23, 0.2);
+      }
+
+      /* Нативный dialog сохраняет управление с клавиатуры и фокусом. */
+      dialog {
+        width: min(720px, calc(100% - 32px));
+        max-height: calc(100dvh - 32px);
+        padding: 0;
+        color: var(--ink);
+        background: var(--bone);
+        border: 1px solid rgba(8, 8, 8, 0.32);
+      }
+
+      dialog::backdrop {
+        background: rgba(0, 0, 0, 0.82);
+        backdrop-filter: blur(4px);
+      }
+
+      body.menu-open,
+      body.dialog-open {
+        overflow: hidden;
+      }
+
+      /* Крупная зона выбора и ясное отмеченное состояние калькулятора. */
+      .estimate-option:has(:checked) {
+        color: var(--bone);
+        background: var(--oxblood);
+        border-color: var(--oxblood);
+      }
+
+      @media (max-width: 767px) {
+        .outline-word {
+          -webkit-text-stroke-width: 0.7px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+
+        .ticker-track {
+          animation: none;
+        }
+
+        .reveal {
+          opacity: 1;
+          transform: none;
+          transition: none;
+        }
+
+        .case-visual-inner {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+
+  <body class="bg-ink font-sans text-bone antialiased">
+    <!-- Шапка остаётся строгой: никаких стеклянных капсул и неоновых кнопок. -->
+    <header class="fixed inset-x-0 top-0 z-50 border-b border-white/15 bg-ink/95 backdrop-blur-md">
+      <div class="mx-auto flex h-[72px] max-w-[1440px] items-center justify-between px-4 sm:px-8">
+        <a href="#top" class="flex items-center gap-3" aria-label="Дана — на главную">
+          <span class="font-mono text-xs tracking-[0.22em]">DANA</span>
+          <span class="h-px w-8 bg-white/35"></span>
+          <span class="text-[10px] uppercase tracking-[0.24em] text-smoke">web development</span>
+        </a>
+
+        <nav class="hidden items-center gap-7 text-xs uppercase tracking-[0.18em] md:flex" aria-label="Основное меню">
+          <a class="transition hover:text-smoke" href="#work">Работы</a>
+          <a class="transition hover:text-smoke" href="#services">Услуги</a>
+          <a class="transition hover:text-smoke" href="#process">Процесс</a>
+          <a class="transition hover:text-smoke" href="#estimate">Стоимость</a>
+        </nav>
+
+        <div class="flex items-center gap-3">
+          <a
+            href="#contact"
+            class="hidden border border-white/30 px-4 py-2.5 text-[11px] uppercase tracking-[0.18em] transition hover:bg-bone hover:text-ink sm:inline-flex"
+          >
+            Обсудить проект
+          </a>
+          <button
+            id="menu-toggle"
+            type="button"
+            class="flex h-11 w-11 items-center justify-center border border-white/25 md:hidden"
+            aria-controls="mobile-menu"
+            aria-expanded="false"
+            aria-label="Открыть меню"
+          >
+            <span class="sr-only">Меню</span>
+            <span id="menu-icon" class="relative block h-3.5 w-5">
+              <span class="absolute left-0 top-0 h-px w-full bg-bone transition"></span>
+              <span class="absolute bottom-0 left-0 h-px w-full bg-bone transition"></span>
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <nav id="mobile-menu" class="hidden border-t border-white/15 bg-ink px-4 py-6 md:hidden" aria-label="Мобильное меню">
+        <div class="flex flex-col font-semibold uppercase tracking-[0.08em]">
+          <a class="mobile-link border-b border-white/15 py-4 text-2xl" href="#work">Работы</a>
+          <a class="mobile-link border-b border-white/15 py-4 text-2xl" href="#services">Услуги</a>
+          <a class="mobile-link border-b border-white/15 py-4 text-2xl" href="#process">Процесс</a>
+          <a class="mobile-link border-b border-white/15 py-4 text-2xl" href="#estimate">Стоимость</a>
+          <a class="mobile-link py-4 text-2xl text-paper" href="#contact">Контакты</a>
+        </div>
+      </nav>
+    </header>
+
+    <main id="top">
+      <!-- Главный экран: деловой оффер + авторский neo-noir образ. -->
+      <section class="relative min-h-[100svh] overflow-hidden border-b border-white/15 pt-[72px]">
+        <div class="mx-auto grid min-h-[calc(100svh-72px)] max-w-[1440px] lg:grid-cols-[1.18fr_0.82fr]">
+          <div class="flex flex-col justify-between px-4 py-10 sm:px-8 sm:py-14 lg:py-16">
+            <div class="flex items-center justify-between gap-4 font-mono text-[10px] uppercase tracking-[0.25em] text-smoke">
+              <span>Лендинги · каталоги · интеграции</span>
+              <span class="hidden sm:inline">Москва / удалённо</span>
+            </div>
+
+            <div class="my-14">
+              <p class="mb-5 font-editorial text-2xl italic text-paper sm:text-3xl">
+                Не ещё один шаблон.
+              </p>
+              <h1 class="text-balance text-[clamp(3.4rem,10vw,8.8rem)] font-extrabold uppercase leading-[0.79] tracking-[-0.075em]">
+                Сайты
+                <span class="outline-word block">с характером</span>
+                <span class="block">и смыслом</span>
+              </h1>
+            </div>
+
+            <div class="grid items-end gap-8 sm:grid-cols-[minmax(0,520px)_auto]">
+              <div>
+                <p class="max-w-xl text-base leading-relaxed text-paper sm:text-lg">
+                  Создаю лендинги и сайты-каталоги для малого бизнеса: продумываю
+                  путь клиента, мобильную версию и понятный способ оставить заявку.
+                </p>
+                <div class="mt-8 flex flex-wrap gap-3">
+                  <a
+                    href="#work"
+                    class="inline-flex min-h-12 items-center border border-bone bg-bone px-6 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-ink transition hover:bg-transparent hover:text-bone"
+                  >
+                    Смотреть работы
+                  </a>
+                  <a
+                    href="#estimate"
+                    class="inline-flex min-h-12 items-center border border-white/30 px-6 py-3 text-xs font-semibold uppercase tracking-[0.18em] transition hover:border-bone"
+                  >
+                    Рассчитать проект
+                  </a>
+                </div>
+              </div>
+              <p class="font-mono text-[10px] uppercase leading-relaxed tracking-[0.22em] text-smoke sm:text-right">
+                Код и доступы<br />остаются у клиента
+              </p>
+            </div>
+          </div>
+
+          <div class="relative min-h-[520px] border-t border-white/15 lg:min-h-0 lg:border-l lg:border-t-0">
+            <div class="hero-metal absolute inset-0 overflow-hidden">
+              <span class="chrome-text absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 font-editorial text-[17rem] italic leading-none sm:text-[23rem] lg:text-[20rem]">
+                D
+              </span>
+              <p class="absolute bottom-7 left-7 z-20 max-w-[190px] font-mono text-[10px] uppercase leading-relaxed tracking-[0.22em] text-paper">
+                Digital craft<br />with a human point of view
+              </p>
+              <p class="absolute right-7 top-7 z-20 [writing-mode:vertical-rl] font-mono text-[9px] uppercase tracking-[0.32em] text-smoke">
+                Independent web developer · 2026
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Маркер специализации между крупными экранами. -->
+      <div class="overflow-hidden border-b border-white/15 bg-oxblood py-4" aria-hidden="true">
+        <div class="ticker-track flex">
+          <p class="whitespace-nowrap font-mono text-xs uppercase tracking-[0.25em]">
+            Лендинги&nbsp;&nbsp; — &nbsp;&nbsp;Каталоги&nbsp;&nbsp; — &nbsp;&nbsp;Telegram-заявки&nbsp;&nbsp; — &nbsp;&nbsp;Мобильная версия&nbsp;&nbsp; — &nbsp;&nbsp;Передача кода&nbsp;&nbsp; — &nbsp;&nbsp;
+          </p>
+          <p class="whitespace-nowrap font-mono text-xs uppercase tracking-[0.25em]">
+            Лендинги&nbsp;&nbsp; — &nbsp;&nbsp;Каталоги&nbsp;&nbsp; — &nbsp;&nbsp;Telegram-заявки&nbsp;&nbsp; — &nbsp;&nbsp;Мобильная версия&nbsp;&nbsp; — &nbsp;&nbsp;Передача кода&nbsp;&nbsp; — &nbsp;&nbsp;
+          </p>
+        </div>
+      </div>
+
+      <!-- Кейсы честно обозначены как учебные и открываются в подробном dialog. -->
+      <section id="work" class="scroll-mt-20 bg-bone px-4 py-20 text-ink sm:px-8 lg:py-28">
+        <div class="mx-auto max-w-[1360px]">
+          <div class="reveal grid gap-8 border-b border-black/25 pb-10 lg:grid-cols-[1fr_1fr]">
+            <div>
+              <p class="font-mono text-[10px] uppercase tracking-[0.28em] text-black/55">01 / selected work</p>
+              <h2 class="mt-5 max-w-3xl text-balance text-5xl font-bold uppercase leading-[0.9] tracking-[-0.055em] sm:text-7xl lg:text-8xl">
+                Не обещания.<br />Работающие прототипы.
+              </h2>
+            </div>
+            <div class="flex items-end lg:justify-end">
+              <p class="max-w-md text-base leading-relaxed text-black/65">
+                Учебные проекты собраны вокруг реальных сценариев бизнеса. Я не
+                выдаю их за клиентские и показываю, какие функции уже умею реализовывать.
+              </p>
+            </div>
+          </div>
+
+          <div class="mt-12 space-y-16 sm:mt-16 sm:space-y-24">
+            <article class="case-card reveal grid gap-6 lg:grid-cols-[1.45fr_0.55fr] lg:gap-10">
+              <div class="case-visual-inner catalog-preview min-h-[420px] p-4 sm:min-h-[520px] sm:p-7">
+                <div class="flex items-center justify-between border-b border-black/25 pb-4">
+                  <span class="font-editorial text-3xl italic sm:text-4xl">Siyanie</span>
+                  <span class="font-mono text-[9px] uppercase tracking-[0.2em]">care objects / catalog</span>
+                </div>
+                <div class="mt-5 flex items-center justify-between gap-4 border-b border-black/15 pb-4 text-[10px] uppercase tracking-[0.14em]">
+                  <span>Все товары · лицо · тело</span>
+                  <span>Поиск / 12</span>
+                </div>
+                <div class="mt-5 grid grid-cols-3 gap-3">
+                  <div class="catalog-product"></div>
+                  <div class="catalog-product"></div>
+                  <div class="catalog-product"></div>
+                </div>
+                <div class="mt-4 grid grid-cols-3 gap-3 font-mono text-[9px] uppercase tracking-[0.12em]">
+                  <span>Night serum<br />2 900 ₽</span>
+                  <span>Body balm<br />2 400 ₽</span>
+                  <span>Face oil<br />3 200 ₽</span>
+                </div>
+              </div>
+
+              <div class="flex flex-col justify-between border-t border-black/25 py-5 lg:border-t-0 lg:py-0">
+                <div>
+                  <div class="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.22em] text-black/50">
+                    <span>Учебный проект</span>
+                    <span>01</span>
+                  </div>
+                  <h3 class="mt-7 text-4xl font-semibold uppercase tracking-[-0.04em]">Каталог «Сияние»</h3>
+                  <p class="mt-5 leading-relaxed text-black/65">
+                    Категории, поиск, карточка товара в модальном окне и простой
+                    путь к заявке без тяжёлой корзины.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  class="case-open mt-10 flex min-h-12 items-center justify-between border-b border-black py-3 text-left text-xs font-semibold uppercase tracking-[0.18em]"
+                  data-case="catalog"
+                >
+                  <span>Состав проекта</span>
+                  <span aria-hidden="true">↗</span>
+                </button>
+              </div>
+            </article>
+
+            <article class="case-card reveal grid gap-6 lg:grid-cols-[0.55fr_1.45fr] lg:gap-10">
+              <div class="order-2 flex flex-col justify-between border-t border-black/25 py-5 lg:order-1 lg:border-t-0 lg:py-0">
+                <div>
+                  <div class="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.22em] text-black/50">
+                    <span>Учебный проект</span>
+                    <span>02</span>
+                  </div>
+                  <h3 class="mt-7 text-4xl font-semibold uppercase tracking-[-0.04em]">Магазин с корзиной</h3>
+                  <p class="mt-5 leading-relaxed text-black/65">
+                    Фильтры, количество товаров, сохранение корзины в браузере
+                    и последовательное оформление заказа.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  class="case-open mt-10 flex min-h-12 items-center justify-between border-b border-black py-3 text-left text-xs font-semibold uppercase tracking-[0.18em]"
+                  data-case="shop"
+                >
+                  <span>Состав проекта</span>
+                  <span aria-hidden="true">↗</span>
+                </button>
+              </div>
+
+              <div class="case-visual-inner shop-preview relative order-1 min-h-[440px] overflow-hidden p-5 sm:min-h-[560px] sm:p-8 lg:order-2">
+                <div class="relative z-10 flex items-center justify-between border-b border-white/25 pb-4">
+                  <span class="text-xl font-bold uppercase tracking-[-0.04em]">Noir Market</span>
+                  <span class="font-mono text-[9px] uppercase tracking-[0.22em]">Cart / 03</span>
+                </div>
+                <div class="shop-object"></div>
+                <p class="absolute bottom-8 left-6 z-10 max-w-[220px] font-editorial text-5xl italic leading-[0.82] sm:left-9 sm:text-7xl">
+                  Objects<br />after dark
+                </p>
+                <span class="absolute bottom-8 right-6 z-10 border border-white/30 px-4 py-2 font-mono text-[9px] uppercase tracking-[0.18em] sm:right-9">
+                  add to cart
+                </span>
+              </div>
+            </article>
+
+            <article class="case-card reveal grid gap-6 lg:grid-cols-[1.45fr_0.55fr] lg:gap-10">
+              <div class="case-visual-inner pay-preview min-h-[430px] p-5 sm:min-h-[540px] sm:p-8">
+                <div class="flex items-center justify-between border-b border-black/25 pb-4">
+                  <span class="font-mono text-[10px] uppercase tracking-[0.24em]">Secure checkout</span>
+                  <span class="font-editorial text-2xl italic">03</span>
+                </div>
+                <div class="mx-auto mt-8 max-w-md">
+                  <div class="pay-panel p-5 sm:p-7">
+                    <p class="font-mono text-[9px] uppercase tracking-[0.22em] text-black/50">Ваш заказ</p>
+                    <div class="mt-5 flex items-center justify-between border-b border-black/15 pb-4">
+                      <span class="font-semibold">Корзина · 3 позиции</span>
+                      <span>8 470 ₽</span>
+                    </div>
+                    <div class="mt-5 space-y-3">
+                      <div class="h-10 border border-black/15 bg-white/50"></div>
+                      <div class="h-10 border border-black/15 bg-white/50"></div>
+                    </div>
+                    <div class="mt-5 bg-oxblood px-4 py-3 text-center text-[10px] font-semibold uppercase tracking-[0.2em] text-bone">
+                      Перейти к оплате
+                    </div>
+                  </div>
+                  <p class="mt-4 text-center font-mono text-[9px] uppercase tracking-[0.2em] text-black/50">
+                    test mode · yookassa
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex flex-col justify-between border-t border-black/25 py-5 lg:border-t-0 lg:py-0">
+                <div>
+                  <div class="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.22em] text-black/50">
+                    <span>Учебный прототип</span>
+                    <span>03</span>
+                  </div>
+                  <h3 class="mt-7 text-4xl font-semibold uppercase tracking-[-0.04em]">Магазин + ЮKassa</h3>
+                  <p class="mt-5 leading-relaxed text-black/65">
+                    Серверный заказ, тестовый платёж, статусы, уведомления
+                    и защищённый вход в административную часть.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  class="case-open mt-10 flex min-h-12 items-center justify-between border-b border-black py-3 text-left text-xs font-semibold uppercase tracking-[0.18em]"
+                  data-case="payment"
+                >
+                  <span>Состав проекта</span>
+                  <span aria-hidden="true">↗</span>
+                </button>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- Услуги поданы строками, а не одинаковой сеткой карточек. -->
+      <section id="services" class="scroll-mt-20 border-b border-white/15 bg-ink px-4 py-20 sm:px-8 lg:py-28">
+        <div class="mx-auto max-w-[1360px]">
+          <div class="reveal grid gap-8 lg:grid-cols-[0.7fr_1.3fr]">
+            <div>
+              <p class="font-mono text-[10px] uppercase tracking-[0.28em] text-smoke">02 / services</p>
+            </div>
+            <h2 class="text-balance text-5xl font-bold uppercase leading-[0.9] tracking-[-0.055em] sm:text-7xl lg:text-8xl">
+              Три формата.<br /><span class="font-editorial font-medium italic normal-case text-paper">Ничего лишнего.</span>
+            </h2>
+          </div>
+
+          <div class="mt-14 border-t border-white/25 sm:mt-20">
+            <article class="reveal grid gap-5 border-b border-white/25 py-8 md:grid-cols-[80px_1fr_1fr_auto] md:items-start">
+              <span class="font-mono text-xs text-smoke">01</span>
+              <h3 class="text-3xl font-semibold uppercase tracking-[-0.035em]">Лендинг</h3>
+              <p class="max-w-lg leading-relaxed text-paper/70">
+                Одна сфокусированная страница: предложение, доверие, ответы
+                на вопросы и понятный путь к заявке.
+              </p>
+              <p class="font-mono text-xs uppercase tracking-[0.18em] md:text-right">от 40 000 ₽<br /><span class="text-smoke">7–10 дней</span></p>
+            </article>
+            <article class="reveal grid gap-5 border-b border-white/25 py-8 md:grid-cols-[80px_1fr_1fr_auto] md:items-start">
+              <span class="font-mono text-xs text-smoke">02</span>
+              <h3 class="text-3xl font-semibold uppercase tracking-[-0.035em]">Сайт-каталог</h3>
+              <p class="max-w-lg leading-relaxed text-paper/70">
+                Категории, поиск, фильтры и карточки. Подходит, когда важно
+                показать ассортимент и получать заявки без сложного магазина.
+              </p>
+              <p class="font-mono text-xs uppercase tracking-[0.18em] md:text-right">от 60 000 ₽<br /><span class="text-smoke">12–16 дней</span></p>
+            </article>
+            <article class="reveal grid gap-5 border-b border-white/25 py-8 md:grid-cols-[80px_1fr_1fr_auto] md:items-start">
+              <span class="font-mono text-xs text-smoke">03</span>
+              <h3 class="text-3xl font-semibold uppercase tracking-[-0.035em]">Сайт компании</h3>
+              <p class="max-w-lg leading-relaxed text-paper/70">
+                Несколько страниц для услуг, команды, кейсов и контента.
+                Структура растёт вместе с компанией.
+              </p>
+              <p class="font-mono text-xs uppercase tracking-[0.18em] md:text-right">от 80 000 ₽<br /><span class="text-smoke">14–20 дней</span></p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- Процесс объясняет, за что клиент платит помимо написания кода. -->
+      <section id="process" class="scroll-mt-20 bg-bone px-4 py-20 text-ink sm:px-8 lg:py-28">
+        <div class="mx-auto max-w-[1360px]">
+          <div class="reveal grid gap-8 lg:grid-cols-2">
+            <div>
+              <p class="font-mono text-[10px] uppercase tracking-[0.28em] text-black/55">03 / process</p>
+              <h2 class="mt-5 text-balance text-5xl font-bold uppercase leading-[0.92] tracking-[-0.055em] sm:text-7xl">
+                Порядок<br />вместо хаоса
+              </h2>
+            </div>
+            <p class="max-w-lg self-end text-lg leading-relaxed text-black/65">
+              Вы видите результат поэтапно, понимаете, что происходит сейчас,
+              и не получаете неожиданностей в день запуска.
+            </p>
+          </div>
+
+          <ol class="mt-14 grid border-l border-t border-black/25 sm:grid-cols-2 lg:mt-20 lg:grid-cols-4">
+            <li class="reveal min-h-[260px] border-b border-r border-black/25 p-6">
+              <span class="font-editorial text-3xl italic text-oxblood">01</span>
+              <h3 class="mt-12 text-xl font-semibold uppercase">Разбираю задачу</h3>
+              <p class="mt-3 text-sm leading-relaxed text-black/60">Цель, аудитория, материалы, функции и ограничения.</p>
+            </li>
+            <li class="reveal min-h-[260px] border-b border-r border-black/25 p-6">
+              <span class="font-editorial text-3xl italic text-oxblood">02</span>
+              <h3 class="mt-12 text-xl font-semibold uppercase">Собираю прототип</h3>
+              <p class="mt-3 text-sm leading-relaxed text-black/60">Сначала логика и путь клиента, затем визуальный слой.</p>
+            </li>
+            <li class="reveal min-h-[260px] border-b border-r border-black/25 p-6">
+              <span class="font-editorial text-3xl italic text-oxblood">03</span>
+              <h3 class="mt-12 text-xl font-semibold uppercase">Разрабатываю</h3>
+              <p class="mt-3 text-sm leading-relaxed text-black/60">Адаптив, интерактивность и проверка на реальных экранах.</p>
+            </li>
+            <li class="reveal min-h-[260px] border-b border-r border-black/25 p-6">
+              <span class="font-editorial text-3xl italic text-oxblood">04</span>
+              <h3 class="mt-12 text-xl font-semibold uppercase">Запускаю</h3>
+              <p class="mt-3 text-sm leading-relaxed text-black/60">HTTPS, доступы, инструкция и период исправления ошибок.</p>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- Калькулятор даёт ориентир, но не изображает автоматическую оферту. -->
+      <section id="estimate" class="scroll-mt-20 border-y border-white/15 bg-ink px-4 py-20 sm:px-8 lg:py-28">
+        <div class="mx-auto max-w-[1360px]">
+          <div class="reveal grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
+            <div>
+              <p class="font-mono text-[10px] uppercase tracking-[0.28em] text-smoke">04 / estimate</p>
+              <h2 class="mt-5 text-balance text-5xl font-bold uppercase leading-[0.92] tracking-[-0.055em] sm:text-7xl">
+                Оценить<br /><span class="font-editorial font-medium italic normal-case text-paper">масштаб</span>
+              </h2>
+            </div>
+            <p class="max-w-lg self-end text-lg leading-relaxed text-paper/70">
+              Выберите формат и дополнения. Это предварительная оценка:
+              точный состав фиксируется после короткого обсуждения.
+            </p>
+          </div>
+
+          <div class="mt-14 grid gap-10 lg:mt-20 lg:grid-cols-[1.25fr_0.75fr]">
+            <form id="estimate-form" class="space-y-12">
+              <fieldset>
+                <legend class="font-mono text-[10px] uppercase tracking-[0.26em] text-smoke">Тип проекта</legend>
+                <div class="mt-5 grid gap-3 sm:grid-cols-3">
+                  <label class="estimate-option cursor-pointer border border-white/25 p-5 transition hover:border-white/60">
+                    <input class="sr-only" type="radio" name="siteType" value="landing" checked />
+                    <span class="block text-lg font-semibold uppercase">Лендинг</span>
+                    <span class="mt-2 block text-sm opacity-65">40 000 ₽ · 7 дней</span>
+                  </label>
+                  <label class="estimate-option cursor-pointer border border-white/25 p-5 transition hover:border-white/60">
+                    <input class="sr-only" type="radio" name="siteType" value="catalog" />
+                    <span class="block text-lg font-semibold uppercase">Каталог</span>
+                    <span class="mt-2 block text-sm opacity-65">60 000 ₽ · 12 дней</span>
+                  </label>
+                  <label class="estimate-option cursor-pointer border border-white/25 p-5 transition hover:border-white/60">
+                    <input class="sr-only" type="radio" name="siteType" value="multipage" />
+                    <span class="block text-lg font-semibold uppercase">Сайт компании</span>
+                    <span class="mt-2 block text-sm opacity-65">80 000 ₽ · 14 дней</span>
+                  </label>
+                </div>
+              </fieldset>
+
+              <fieldset>
+                <legend class="font-mono text-[10px] uppercase tracking-[0.26em] text-smoke">Дополнения</legend>
+                <div class="mt-5 divide-y divide-white/20 border-y border-white/20">
+                  <label class="flex cursor-pointer items-center justify-between gap-5 py-5">
+                    <span>
+                      <span class="block font-semibold uppercase">Анимация интерфейса</span>
+                      <span class="mt-1 block text-sm text-smoke">Плавные появления и состояния элементов</span>
+                    </span>
+                    <span class="flex items-center gap-4">
+                      <span class="hidden font-mono text-[10px] text-smoke sm:inline">+15 000 ₽</span>
+                      <input class="h-5 w-5 accent-[#681825]" type="checkbox" name="feature" value="animation" />
+                    </span>
+                  </label>
+                  <label class="flex cursor-pointer items-center justify-between gap-5 py-5">
+                    <span>
+                      <span class="block font-semibold uppercase">Заявка в Telegram</span>
+                      <span class="mt-1 block text-sm text-smoke">Сообщение владельцу после отправки формы</span>
+                    </span>
+                    <span class="flex items-center gap-4">
+                      <span class="hidden font-mono text-[10px] text-smoke sm:inline">+8 000 ₽</span>
+                      <input class="h-5 w-5 accent-[#681825]" type="checkbox" name="feature" value="telegram" />
+                    </span>
+                  </label>
+                  <label class="flex cursor-pointer items-center justify-between gap-5 py-5">
+                    <span>
+                      <span class="block font-semibold uppercase">Квиз</span>
+                      <span class="mt-1 block text-sm text-smoke">Пошаговый подбор вместо длинной формы</span>
+                    </span>
+                    <span class="flex items-center gap-4">
+                      <span class="hidden font-mono text-[10px] text-smoke sm:inline">+12 000 ₽</span>
+                      <input class="h-5 w-5 accent-[#681825]" type="checkbox" name="feature" value="quiz" />
+                    </span>
+                  </label>
+                </div>
+              </fieldset>
+            </form>
+
+            <aside class="h-fit border border-white/25 bg-bone p-6 text-ink lg:sticky lg:top-24 sm:p-8">
+              <p class="font-mono text-[10px] uppercase tracking-[0.24em] text-black/50">Ориентир</p>
+              <p id="estimate-price" class="mt-5 text-5xl font-bold tracking-[-0.06em] sm:text-6xl">40 000 ₽</p>
+              <p id="estimate-days" class="mt-2 font-editorial text-2xl italic text-oxblood">7 дней</p>
+              <ul id="estimate-details" class="mt-8 space-y-3 border-t border-black/20 pt-5 text-sm text-black/60"></ul>
+              <button
+                id="estimate-action"
+                type="button"
+                class="mt-8 min-h-12 w-full bg-ink px-5 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-bone transition hover:bg-oxblood"
+              >
+                Скопировать расчёт
+              </button>
+              <p id="copy-status" class="mt-3 min-h-5 text-center text-xs text-black/50" aria-live="polite"></p>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <!-- Личный блок добавляет человеческий голос без выдуманных отзывов. -->
+      <section class="bg-walnut px-4 py-20 sm:px-8 lg:py-28">
+        <div class="reveal mx-auto grid max-w-[1360px] gap-10 lg:grid-cols-[0.75fr_1.25fr]">
+          <div class="relative min-h-[380px] overflow-hidden border border-white/20">
+            <div class="absolute inset-10 border border-white/15"></div>
+            <span class="chrome-text absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-editorial text-[15rem] italic leading-none sm:text-[19rem]">
+              D
+            </span>
+            <p class="absolute bottom-6 left-6 font-mono text-[9px] uppercase tracking-[0.28em] text-paper/70">
+              personal approach / direct contact
+            </p>
+          </div>
+          <div class="flex flex-col justify-center">
+            <p class="font-mono text-[10px] uppercase tracking-[0.28em] text-paper/60">Обо мне</p>
+            <h2 class="mt-5 text-balance text-5xl font-bold uppercase leading-[0.92] tracking-[-0.055em] sm:text-7xl">
+              Я Дана.<br /><span class="font-editorial font-medium italic normal-case text-paper">Работаю напрямую.</span>
+            </h2>
+            <p class="mt-8 max-w-2xl text-lg leading-relaxed text-paper/70">
+              Не передаю задачу между менеджерами и подрядчиками. Сама разбираю
+              структуру, собираю интерфейс и показываю промежуточный результат.
+              Если чего-то ещё не делала в боевом проекте — говорю об этом до начала работы.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Контакт пока безопасно работает без фиктивной Telegram-ссылки. -->
+      <section id="contact" class="scroll-mt-20 bg-oxblood px-4 py-20 sm:px-8 lg:py-28">
+        <div class="mx-auto max-w-[1360px]">
+          <p class="font-mono text-[10px] uppercase tracking-[0.28em] text-paper/70">05 / contact</p>
+          <div class="mt-8 grid gap-10 lg:grid-cols-[1.25fr_0.75fr] lg:items-end">
+            <h2 class="text-balance text-[clamp(3.6rem,9vw,8.5rem)] font-extrabold uppercase leading-[0.8] tracking-[-0.07em]">
+              Есть задача?<br /><span class="font-editorial font-medium italic normal-case">Разберём.</span>
+            </h2>
+            <div>
+              <p id="contact-copy" class="max-w-md leading-relaxed text-paper/80">
+                Личный Telegram будет добавлен перед запуском продаж. Пока можно посмотреть код и проекты на GitHub.
+              </p>
+              <div class="mt-7 flex flex-wrap gap-3">
+                <a
+                  id="telegram-link"
+                  href="#contact"
+                  class="inline-flex min-h-12 items-center border border-bone bg-bone px-6 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-ink"
+                >
+                  Telegram скоро
+                </a>
+                <a
+                  href="https://github.com/dana-webb"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex min-h-12 items-center border border-white/45 px-6 py-3 text-xs font-semibold uppercase tracking-[0.18em] transition hover:border-bone"
+                >
+                  GitHub
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="border-t border-white/15 bg-ink px-4 py-7 sm:px-8">
+      <div class="mx-auto flex max-w-[1360px] flex-col gap-4 font-mono text-[9px] uppercase tracking-[0.24em] text-smoke sm:flex-row sm:items-center sm:justify-between">
+        <p>© <span id="year">2026</span> Dana / Web development</p>
+        <p>Сайты с характером и понятной логикой</p>
+      </div>
+    </footer>
+
+    <!-- Окно с деталями кейса заполняется данными из app.js. -->
+    <dialog id="case-dialog" aria-labelledby="dialog-title">
+      <div class="flex items-start justify-between gap-5 border-b border-black/20 p-5 sm:p-7">
+        <div>
+          <p id="dialog-label" class="font-mono text-[9px] uppercase tracking-[0.24em] text-black/50"></p>
+          <h2 id="dialog-title" class="mt-2 text-3xl font-semibold uppercase tracking-[-0.04em]"></h2>
+        </div>
+        <button
+          id="dialog-close"
+          type="button"
+          class="flex h-11 w-11 shrink-0 items-center justify-center border border-black/25 text-xl"
+          aria-label="Закрыть окно"
+        >
+          ×
+        </button>
+      </div>
+      <div class="p-5 sm:p-7">
+        <p id="dialog-description" class="max-w-2xl leading-relaxed text-black/65"></p>
+        <h3 class="mt-8 font-mono text-[10px] uppercase tracking-[0.24em] text-black/50">Реализовано</h3>
+        <ul id="dialog-features" class="mt-4 divide-y divide-black/15 border-y border-black/15"></ul>
+        <p id="dialog-note" class="mt-6 border-l-2 border-oxblood pl-4 text-sm leading-relaxed text-black/60"></p>
+      </div>
+    </dialog>
+
+    <script src="app.js"></script>
+  </body>
+</html>
